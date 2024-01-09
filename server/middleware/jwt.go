@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/Anisulh/content_personalization/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 )
@@ -26,7 +26,7 @@ func JWTProtected() func(*fiber.Ctx) error {
 			}
 
 			// Return the secret key
-			return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+			return []byte(utils.JWTSecret), nil
 		})
 
 		// Check if the token is valid

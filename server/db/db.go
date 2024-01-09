@@ -1,15 +1,13 @@
 package db
 
 import (
-	"os"
-
+	"github.com/Anisulh/content_personalization/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func SetupDatabase() (*gorm.DB, error) {
-	connStr := os.Getenv("DATABASE_URL")
-	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(utils.DBConnectionString), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

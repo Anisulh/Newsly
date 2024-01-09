@@ -2,14 +2,13 @@ package utils
 
 import (
 	"errors"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 )
 
 func GenerateJWT(id uint) (string, error) {
-	jwtSecret := []byte(os.Getenv("JWTSECRET"))
+	jwtSecret := []byte(JWTSecret)
 if len(jwtSecret) == 0 {
 	return "", errors.New("JWT secret is not set")
 }
