@@ -7,8 +7,12 @@ type Content struct {
 	Title       string
 	Description string
 	URL         string
+	ImageURL    string
+	PublishedAt string
+	Source      string
 	CategoryID  uint
-	Category    Category
+	Category    string //Category
+	Keywords		[]string
 	Likes       []User `gorm:"many2many:user_likes;"`
 	Dislikes    []User `gorm:"many2many:user_dislikes;"`
 }
