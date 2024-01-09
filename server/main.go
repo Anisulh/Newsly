@@ -2,36 +2,30 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/Anisulh/content_personalization/db"
 	"github.com/Anisulh/content_personalization/handlers"
 	"github.com/Anisulh/content_personalization/middleware"
+	"github.com/Anisulh/content_personalization/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	// Load environment variables
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	utils.LoadEnv()
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,
 	})
-
-	allowedCorsHeaders := os.Getenv("DATABASE_URL")
-
+	
 	// Middlewares
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: allowedCorsHeaders,
+		AllowOrigins: utils.ClientAddress,
 		AllowHeaders: "Authorization, Origin, Content-Type, Accept",
-	})) // Configure according to your needs
-	app.Use(logger.New()) // Logs every request to the console
+	})) 
+	app.Use(logger.New()) 
 	app.Use("/api/secure", middleware.JWTProtected())
 
 	// Database connection
@@ -63,21 +57,16 @@ func main() {
 	app.Get("/api/secure/user/preferences", handler.GetUserPreferences)
 	app.Put("/api/secure/user/preferences", handler.UpdateUserPreferences)
 
-	// 	Public Routes
 
-	//     Content Discovery:
-	//         GET /content - Fetch a list of content (articles, posts, etc.) for unauthenticated users.
-	//         GET /content/categories - Get a list of content categories or tags.
+	// Content Interaction
+	app.Post("/api/secure/content/:contentId/like", handlers.LikeContent) 
+	app.Post("/api/secure/content/:contentId/dislike", handlers.DislikeContent)  
+	app.Post("/api/secure/content/:contentId/bookmark", handlers.BookmarkContent)  
+
+	// Personalized Content Feed:
+	app.Get("/api/secure/feed") // Fetch the personalized content feed based on user preferences and behavior.
 
 	// Secured Routes
-
-	//     Personalized Content Feed:
-	//         GET /feed - Fetch the personalized content feed based on user preferences and behavior.
-
-	//     Content Interaction:
-	//         POST /content/like - User likes a piece of content.
-	//         POST /content/dislike - User dislikes a piece of content.
-	//         POST /content/bookmark - User bookmarks a piece of content.
 
 	//     User Feedback:
 	//         POST /feedback - Submit feedback on content recommendations.
@@ -105,7 +94,11 @@ func main() {
 	//     Admin Analytics:
 	//         GET /admin/analytics - Access overall platform analytics.
 
+	// Start the scheduled fetching
+	utils.StartScheduledFetching()
+
 	// Start server
 	log.Println("Server starting on port 4000...")
 	log.Fatal(app.Listen(":4000"))
 }
+
