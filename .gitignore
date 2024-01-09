@@ -44,3 +44,9 @@ dist-ssr
 
 # Go workspace file
 go.work
+
+text_classification/env
+
+text_classification/models/results_v1
+
+__pycache__
