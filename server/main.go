@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Anisulh/content_personalization/db"
 	"github.com/Anisulh/content_personalization/handlers"
@@ -33,12 +36,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("Database connection failed: %v", err)
 	}
+	// Start the scheduled fetching
+	go utils.StartScheduledFetching(database)
+	go utils.StoreNews(database)
 
 	// Handlers
 	handler := handlers.NewHandler(database)
 
 	// Public Routes
-	app.Get("/api/healthcheck", handler.HealthCheck)
+	app.Get("/api/healthCheck", handler.HealthCheck)
 
 	// User Auth
 	app.Post("/api/register", handler.UserRegistration)
@@ -57,48 +63,35 @@ func main() {
 	app.Get("/api/secure/user/preferences", handler.GetUserPreferences)
 	app.Put("/api/secure/user/preferences", handler.UpdateUserPreferences)
 
-
 	// Content Interaction
 	app.Post("/api/secure/content/:contentId/like", handlers.LikeContent) 
 	app.Post("/api/secure/content/:contentId/dislike", handlers.DislikeContent)  
 	app.Post("/api/secure/content/:contentId/bookmark", handlers.BookmarkContent)  
 
-	// Personalized Content Feed:
-	app.Get("/api/secure/feed") // Fetch the personalized content feed based on user preferences and behavior.
 
-	// Secured Routes
+	// Channel to listen for interrupt signal
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	//     User Feedback:
-	//         POST /feedback - Submit feedback on content recommendations.
+	// Start server in a goroutine
+	go func() {
+		log.Println("Server starting on port 4000...")
+		if err := app.Listen(":4000"); err != nil {
+			log.Fatalf("Error starting server: %v", err)
+		}
+	}()
 
-	//     Analytics (for User Engagement):
-	//         GET /analytics/user-activity - Retrieve user activity and engagement analytics.
+	// Block until a signal is received
+	<-c
+	log.Println("Gracefully shutting down...")
 
-	//     Content Management (If you plan to allow user-generated content):
-	//         POST /content/create - Create new content.
-	//         PUT /content/update - Update existing content.
-	//         DELETE /content/delete - Delete content.
 
-	// Administrative Routes (If applicable)
+	if err := app.Shutdown(); err != nil {
+		log.Fatalf("Server shutdown failed: %v", err)
+	}
 
-	//     Admin Content Management:
-	//         POST /admin/content - Add new content to the platform.
-	//         PUT /admin/content/{id} - Update specific content.
-	//         DELETE /admin/content/{id} - Remove specific content from the platform.
+	// Additional resource cleanup here...
+	log.Println("Server stopped")
 
-	//     Admin User Management:
-	//         GET /admin/users - List all users.
-	//         GET /admin/users/{id} - View details of a specific user.
-	//         DELETE /admin/users/{id} - Delete a user account.
-
-	//     Admin Analytics:
-	//         GET /admin/analytics - Access overall platform analytics.
-
-	// Start the scheduled fetching
-	utils.StartScheduledFetching()
-
-	// Start server
-	log.Println("Server starting on port 4000...")
-	log.Fatal(app.Listen(":4000"))
 }
 
