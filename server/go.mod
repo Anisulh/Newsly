@@ -6,6 +6,9 @@ require (
 	github.com/gofiber/fiber/v2 v2.51.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
+	github.com/segmentio/kafka-go v0.4.47
+	golang.org/x/crypto v0.17.0
+	gorm.io/gorm v1.25.5
 )
 
 require (
@@ -30,16 +33,15 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	gorm.io/gorm v1.25.5 // indirect
 )
 
 require (
 	github.com/IBM/sarama v1.42.1
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/aws/aws-sdk-go v1.49.13
+	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
