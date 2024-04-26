@@ -3,8 +3,8 @@ package handlers
 import (
 	"strconv"
 
-	"github.com/Anisulh/content_personalization/models"
-	"github.com/Anisulh/content_personalization/utils"
+	"Newsly/internal/models"
+	"Newsly/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
