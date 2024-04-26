@@ -48,7 +48,7 @@ func main() {
 	
 
 	// Public Routes
-	app.Get("/api/healthCheck", handler.HealthCheck)
+	app.Get("/api/health-check", handler.HealthCheck)
 
 	// User Auth
 	app.Post("/api/register", handler.UserRegistration)
