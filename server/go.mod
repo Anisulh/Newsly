@@ -63,6 +63,7 @@ require (
 	github.com/aws/aws-sdk-go v1.50.7
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
