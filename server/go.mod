@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.2
 
 require (
-	github.com/gofiber/fiber/v2 v2.51.0
+	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/segmentio/kafka-go v0.4.47
@@ -59,6 +59,7 @@ require (
 
 require (
 	github.com/IBM/sarama v1.42.1
+	github.com/a-h/templ v0.2.663
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/aws/aws-sdk-go v1.50.7
 	github.com/confluentinc/confluent-kafka-go v1.9.2
