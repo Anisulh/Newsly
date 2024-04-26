@@ -26,7 +26,7 @@ func (h *Handler) UserRegistration(c *fiber.Ctx) error {
 	if res.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 	}
-	token, err := utils.GenerateJWT(userInfo.ID)
+	token, err := utils.GenerateJWT(userInfo.ID, h.JWTSecret)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 	}
@@ -66,7 +66,7 @@ func (h *Handler) UserLogin(c *fiber.Ctx) error {
 	}
 
 	// Generate JWT token
-	token, err := utils.GenerateJWT(user.ID)
+	token, err := utils.GenerateJWT(user.ID, h.JWTSecret)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 	}
