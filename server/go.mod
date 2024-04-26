@@ -1,4 +1,4 @@
-module github.com/Anisulh/content_personalization
+module Newsly
 
 go 1.22
 
