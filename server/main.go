@@ -19,6 +19,12 @@ func main() {
 	// Load environment variables
 	utils.LoadEnv()
 
+	// Database connection
+	database, err := db.SetupDatabase()
+	if err != nil {
+		log.Fatalf("Database connection failed: %v", err)
+	}
+
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,
 	})
@@ -31,17 +37,15 @@ func main() {
 	app.Use(logger.New()) 
 	app.Use("/api/secure", middleware.JWTProtected())
 
-	// Database connection
-	database, err := db.SetupDatabase()
-	if err != nil {
-		log.Fatalf("Database connection failed: %v", err)
-	}
+	
 	// Start the scheduled fetching
 	go utils.StartScheduledFetching(database)
 	go utils.StoreNews(database)
 
 	// Handlers
 	handler := handlers.NewHandler(database)
+
+	
 
 	// Public Routes
 	app.Get("/api/healthCheck", handler.HealthCheck)
