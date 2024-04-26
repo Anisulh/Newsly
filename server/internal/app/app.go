@@ -29,9 +29,20 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	// Handlers
 	handler := handlers.NewHandler(db, config.JWTSecret)
 
-	// Public Routes
+	// health check
 	app.Get("/api/health-check", handler.HealthCheck)
 
+	// Public Page Routes
+	pageRouter := app.Group("/")
+	pageRouter.Get("/", handler.GetHomePage)
+	pageRouter.Get("/login", handler.GetLoginPage)
+	pageRouter.Get("/register", handler.GetRegisterPage)
+	pageRouter.Get("/news", handler.GetNewsPage)
+	pageRouter.Get("/news/:id", handler.GetNewsDetailPage)
+	pageRouter.Get("/profile", handler.GetProfilePage)
+	pageRouter.Get("/preferences", handler.GetPreferencesPage)
+
+	// API Routes
 	// User Auth
 	userPublicRouter := app.Group("/api/user")
 	userPublicRouter.Post("/register", handler.UserRegistration)
@@ -43,7 +54,6 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	contentPublicRouter.Get("/categories", handler.GetContentCategories)
 
 	// Secured Routes
-
 	// User Profile
 	userPrivateRouter := app.Group("/api/user", middleware.JWTProtected(config.JWTSecret))
 	userPrivateRouter.Get("/profile", handler.GetUserProfile)
