@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Anisulh/content_personalization/models"
+	"Newsly/internal/models"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gorm.io/gorm"
 )
@@ -50,7 +50,7 @@ type NewsAPIResponse struct {
 const KafkaTopicNewsInput = "news-input"
 const KafkaConsumerGroup = "news-consumer-group"
 
-func FetchNews(db *gorm.DB) error {
+func FetchNews(db *gorm.DB, NewsAPIKey string) error {
 	log.Println("Fetching news")
 	url := fmt.Sprintf("https://newsapi.org/v2/top-headlines?country=us&apiKey=%v", NewsAPIKey)
 	client := &http.Client{
@@ -131,20 +131,20 @@ func FetchNews(db *gorm.DB) error {
 	return nil
 }
 
-func StartScheduledFetching(db *gorm.DB) {
+func StartScheduledFetching(db *gorm.DB, NewsAPIKey string) {
 	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
 
 	// Run the task once immediately and then schedule it to run periodically
-	fetchAndLogNews(db)
+	fetchAndLogNews(db, NewsAPIKey)
 	
 	for range ticker.C {
-			fetchAndLogNews(db)
+			fetchAndLogNews(db, NewsAPIKey)
 	}
 }
 
-func fetchAndLogNews(db *gorm.DB) {
-	err := FetchNews(db)
+func fetchAndLogNews(db *gorm.DB, NewsAPIKey string) {
+	err := FetchNews(db, NewsAPIKey)
 	if err != nil {
 			log.Printf("Error fetching news: %s", err)
 	} else {
