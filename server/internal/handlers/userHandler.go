@@ -3,8 +3,9 @@ package handlers
 import (
 	"time"
 
-	"github.com/Anisulh/content_personalization/models"
-	"github.com/Anisulh/content_personalization/utils"
+	"Newsly/internal/models"
+	"Newsly/internal/utils"
+
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -83,59 +84,55 @@ func (h *Handler) UserLogin(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": "User logged in successfully"})
 }
 
-
 // Secured Routes
 
 func (h *Handler) GetUserProfile(c *fiber.Ctx) error {
-    userID := c.Locals("userID").(string)
+	userID := c.Locals("userID").(string)
 
-    var user models.User
-    if err := h.DB.First(&user, userID).Error; err != nil {
-        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
-    }
+	var user models.User
+	if err := h.DB.First(&user, userID).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+	}
 
-    return c.JSON(user)
+	return c.JSON(user)
 }
-
 
 func (h *Handler) UpdateUserProfile(c *fiber.Ctx) error {
-    userID := c.Locals("userID").(string)
+	userID := c.Locals("userID").(string)
 
-    var updateInfo models.User
-    if err := c.BodyParser(&updateInfo); err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user information"})
-    }
+	var updateInfo models.User
+	if err := c.BodyParser(&updateInfo); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user information"})
+	}
 
-    if err := h.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updateInfo).Error; err != nil {
-        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not update user profile"})
-    }
+	if err := h.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updateInfo).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not update user profile"})
+	}
 
-    return c.SendStatus(fiber.StatusOK)
+	return c.SendStatus(fiber.StatusOK)
 }
-
 
 func (h *Handler) GetUserPreferences(c *fiber.Ctx) error {
-    userID := c.Locals("userID").(string)
+	userID := c.Locals("userID").(string)
 
-    var preferences []models.Preference
-    if err := h.DB.Where("user_id = ?", userID).Find(&preferences).Error; err != nil {
-        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not fetch preferences"})
-    }
+	var preferences []models.Preference
+	if err := h.DB.Where("user_id = ?", userID).Find(&preferences).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not fetch preferences"})
+	}
 
-    return c.JSON(preferences)
+	return c.JSON(preferences)
 }
 
-
 func (h *Handler) UpdateUserPreferences(c *fiber.Ctx) error {
-    //userID := c.Locals("userID").(string)
+	//userID := c.Locals("userID").(string)
 
-    var newPreferences []models.Preference
-    if err := c.BodyParser(&newPreferences); err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid preference format"})
-    }
+	var newPreferences []models.Preference
+	if err := c.BodyParser(&newPreferences); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid preference format"})
+	}
 
-    // Update preferences logic
-    // ...
+	// Update preferences logic
+	// ...
 
-    return c.SendStatus(fiber.StatusOK)
+	return c.SendStatus(fiber.StatusOK)
 }
