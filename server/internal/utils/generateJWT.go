@@ -7,8 +7,8 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateJWT(id uint) (string, error) {
-	jwtSecret := []byte(JWTSecret)
+func GenerateJWT(id uint, secret string) (string, error) {
+	jwtSecret := []byte(secret)
 if len(jwtSecret) == 0 {
 	return "", errors.New("JWT secret is not set")
 }
