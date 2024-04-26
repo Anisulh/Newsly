@@ -3,7 +3,8 @@ package middleware
 import (
 	"fmt"
 
-	"github.com/Anisulh/content_personalization/utils"
+	"Newsly/internal/utils"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 )
