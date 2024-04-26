@@ -12,7 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 
 	app := fiber.New(fiber.Config{
@@ -25,10 +24,10 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 		AllowHeaders: "Authorization, Origin, Content-Type, Accept",
 	}))
 	app.Use(logger.New())
-	app.Use("/api/secure", middleware.JWTProtected())
+	app.Use("/api/secure", middleware.JWTProtected(config.JWTSecret))
 
 	// Handlers
-	handler := handlers.NewHandler(db)
+	handler := handlers.NewHandler(db, config.JWTSecret)
 
 	// Public Routes
 	app.Get("/api/health-check", handler.HealthCheck)
@@ -46,14 +45,14 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	// Secured Routes
 
 	// User Profile
-	userPrivateRouter := app.Group("/api/user", middleware.JWTProtected())
+	userPrivateRouter := app.Group("/api/user", middleware.JWTProtected(config.JWTSecret))
 	userPrivateRouter.Get("/profile", handler.GetUserProfile)
 	userPrivateRouter.Put("/profile", handler.UpdateUserProfile)
 	userPrivateRouter.Get("/preferences", handler.GetUserPreferences)
 	userPrivateRouter.Put("/preferences", handler.UpdateUserPreferences)
 
 	// Content Interaction
-	contentPrivateRouter := app.Group("/api/content")
+	contentPrivateRouter := app.Group("/api/content", middleware.JWTProtected(config.JWTSecret))
 	contentPrivateRouter.Post("/:contentId/like", handlers.LikeContent)
 	contentPrivateRouter.Post("/:contentId/dislike", handlers.DislikeContent)
 	contentPrivateRouter.Post("/:contentId/bookmark", handlers.BookmarkContent)
