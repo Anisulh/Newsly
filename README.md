@@ -8,6 +8,8 @@
 
 Welcome to the repository for Newsly, a news recommendation engine inspired by TikTok's "For You" page. Newsly leverages a backend written in Go, utilizing the Fiber framework for its lightweight and efficient server capabilities, Templ for templating, and HTMX for dynamic content updates.
 
+If you haven't already, check out the Newsly NLP Service: [https://github.com/Anisulh/NewlyNLP](https://github.com/Anisulh/NewlyNLP)
+
 ## Project Overview
 
 Newsly aims to deliver a seamless and highly personalized news reading experience. By integrating advanced NLP techniques using a custom-tuned BERT model, the system categorizes and tags incoming news articles which are then recommended based on user interactions such as likes, dislikes, and saves. Here’s how it works:
