@@ -53,4 +53,4 @@ text_classification/data
 
 __pycache__
 
-temp/
+tmp/
