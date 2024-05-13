@@ -9,7 +9,7 @@ import (
 	"Newsly/config"
 	"Newsly/internal/app"
 	"Newsly/internal/db"
-	"Newsly/internal/utils"
+	//"Newsly/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,8 +22,8 @@ func main() {
 	database := db.MustLoadDatabase(config.DBConnectionString)
 
 	// Start the scheduled fetching
-	go utils.StartScheduledFetching(database, config.NewsAPIKey)
-	go utils.StoreNews(database)
+	// go utils.StartScheduledFetching(database, config.NewsAPIKey)
+	// go utils.StoreNews(database)
 
 	// Start the server
 	app := app.MustStart(database, config)
