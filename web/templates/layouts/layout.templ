@@ -1,13 +1,13 @@
-package templates
+package layouts
 
-import "Newsly/internal/models"
+import (
+    "Newsly/web/templates/partials"
+	"Newsly/internal/utils"
+)
 
-type BaseData struct {
-    IsAuth  bool        
-    Account *models.User
-}
 
-templ layout(data BaseData) {
+
+templ Layout(data utils.BaseData) {
     <!DOCTYPE html>
     <html lang="en">
         <head>
@@ -21,7 +21,7 @@ templ layout(data BaseData) {
             <script src="static/script/main.js"></script>
         </head>
         <body>
-            @navigation(data)
+            @partials.Navigation(data)
             { children... }
         </body>
     </html>
