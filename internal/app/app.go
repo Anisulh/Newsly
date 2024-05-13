@@ -13,10 +13,11 @@ import (
 )
 
 func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
-
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,
 	})
+
+	app.Static("/static", "./web/static")
 
 	// Middlewares
 	app.Use(cors.New(cors.Config{
@@ -37,10 +38,10 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	pageRouter.Get("/", handler.GetHomePage)
 	pageRouter.Get("/login", handler.GetLoginPage)
 	pageRouter.Get("/register", handler.GetRegisterPage)
-	pageRouter.Get("/news", handler.GetNewsPage)
-	pageRouter.Get("/news/:id", handler.GetNewsDetailPage)
-	pageRouter.Get("/profile", handler.GetProfilePage)
-	pageRouter.Get("/preferences", handler.GetPreferencesPage)
+	// pageRouter.Get("/news", handler.GetNewsPage)
+	// pageRouter.Get("/news/:id", handler.GetNewsDetailPage)
+	// pageRouter.Get("/profile", handler.GetProfilePage)
+	// pageRouter.Get("/preferences", handler.GetPreferencesPage)
 
 	// API Routes
 	// User Auth
@@ -49,9 +50,9 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	userPublicRouter.Post("/login", handler.UserLogin)
 
 	// Content Discover
-	contentPublicRouter := app.Group("/api/content")
-	contentPublicRouter.Get("/", handler.GetContent)
-	contentPublicRouter.Get("/categories", handler.GetContentCategories)
+	// contentPublicRouter := app.Group("/api/content")
+	// contentPublicRouter.Get("/", handler.GetContent)
+	// contentPublicRouter.Get("/categories", handler.GetContentCategories)
 
 	// Secured Routes
 	// User Profile
@@ -62,10 +63,10 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	userPrivateRouter.Put("/preferences", handler.UpdateUserPreferences)
 
 	// Content Interaction
-	contentPrivateRouter := app.Group("/api/content", middleware.JWTProtected(config.JWTSecret))
-	contentPrivateRouter.Post("/:contentId/like", handlers.LikeContent)
-	contentPrivateRouter.Post("/:contentId/dislike", handlers.DislikeContent)
-	contentPrivateRouter.Post("/:contentId/bookmark", handlers.BookmarkContent)
+	// contentPrivateRouter := app.Group("/api/content", middleware.JWTProtected(config.JWTSecret))
+	// contentPrivateRouter.Post("/:contentId/like", handlers.LikeContent)
+	// contentPrivateRouter.Post("/:contentId/dislike", handlers.DislikeContent)
+	// contentPrivateRouter.Post("/:contentId/bookmark", handlers.BookmarkContent)
 
 	return app, nil
 }
@@ -77,7 +78,7 @@ func MustStart(db *gorm.DB, config *config.Config) *fiber.App {
 		panic(err)
 	}
 	go func() {
-		log.Println("Server starting on port 4000...")
+		log.Println("Server starting on port:", config.Port)
 		if err := app.Listen(":" + config.Port); err != nil {
 			panic("Error starting server: " + err.Error())
 		}
