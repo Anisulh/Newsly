@@ -38,6 +38,7 @@ func (h *Handler) UserRegistration(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&cookie)
+	c.Set("HX-Redirect", "/feed")
 
 	// Sending back a success message
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"success": "User registered successfully"})
@@ -73,7 +74,7 @@ func (h *Handler) UserLogin(c *fiber.Ctx) error {
 
 	// Set cookie
 	cookie := fiber.Cookie{
-		Name:     "jwt",
+		Name:     "token",
 		Value:    token,
 		HTTPOnly: true,
 		Expires:  time.Now().Add(72 * time.Hour),
@@ -81,6 +82,7 @@ func (h *Handler) UserLogin(c *fiber.Ctx) error {
 
 	c.Cookie(&cookie)
 
+	c.Set("HX-Redirect", "/feed")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": "User logged in successfully"})
 }
 
