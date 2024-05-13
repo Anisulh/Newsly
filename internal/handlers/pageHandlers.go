@@ -1,15 +1,29 @@
 package handlers
 
 import (
+	"Newsly/web/templates"
+
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
+func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.ComponentHandler)) error {
+	componentHandler := templ.Handler(component)
+	for _, o := range options {
+		o(componentHandler)
+	}
+	return adaptor.HTTPHandler(componentHandler)(c)
+}
+
 func (h *Handler) GetHomePage(c *fiber.Ctx) error {
+	return Render(c, templates.HomePage())
+}
 
-	handler := adaptor.HTTPHandler(templ.Handler(templates.Home()))
+func (h *Handler) GetLoginPage(c *fiber.Ctx) error {
+	return Render(c, templates.LoginPage())
+}
 
-	return handler(c)
-
+func (h *Handler) GetRegisterPage(c *fiber.Ctx) error {
+	return Render(c, templates.RegisterPage())
 }
