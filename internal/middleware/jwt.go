@@ -11,10 +11,11 @@ import (
 func JWTProtected(secret string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Retrieve the JWT token from the cookie
-		tokenString := c.Cookies("jwt")
+		tokenString := c.Cookies("token")
 
 		// If the cookie is empty, return an unauthorized error
 		if tokenString == "" {
+			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Unauthorized",
 				"message": "No token provided",
@@ -32,6 +33,7 @@ func JWTProtected(secret string) fiber.Handler {
 
 		// Check if the token is valid
 		if err != nil {
+			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Unauthorized",
 				"message": "Invalid token",
@@ -41,6 +43,7 @@ func JWTProtected(secret string) fiber.Handler {
 
 		// Ensure the token was successfully validated
 		if !token.Valid {
+			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: Invalid token")
 		}
 
@@ -48,10 +51,12 @@ func JWTProtected(secret string) fiber.Handler {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			userID, ok := claims["user_id"].(string) // Ensure type assertion is safe
 			if !ok {
+				c.Set("HX-Redirect", "/")
 				return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: User ID invalid")
 			}
 			c.Locals("userID", userID) // Setting the user ID in Fiber's context
 		} else {
+			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: Invalid token")
 		}
 
