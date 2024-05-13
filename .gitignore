@@ -52,3 +52,5 @@ text_classification/models
 text_classification/data
 
 __pycache__
+
+temp/
