@@ -1,19 +1,61 @@
 // news_aggregator.go
 package utils
 
-// import (
-// 	"encoding/json"
-// 	"errors"
-// 	"fmt"
-// 	"io"
-// 	"log"
-// 	"net/http"
-// 	"time"
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"time"
+)
 
-// 	"Newsly/internal/models"
-// 	"github.com/confluentinc/confluent-kafka-go/kafka"
-// 	"gorm.io/gorm"
-// )
+// Struct to parse response from NewsAPI
+type NewsAPIResponse struct {
+	Articles []Article `json:"articles"`
+}
+type Article struct {
+	Source struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"source"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Url         string `json:"url"`
+	UrlToImage  string `json:"urlToImage"`
+	PublishedAt string `json:"publishedAt"`
+	Content     string `json:"content"`
+}
+
+func FetchNews(NewsAPIKey string) (NewsAPIResponse, error) {
+	log.Println("Fetching news")
+	url := fmt.Sprintf("https://newsapi.org/v2/top-headlines?country=us&apiKey=%v", NewsAPIKey)
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	resp, err := client.Get(url)
+	if err != nil {
+		return NewsAPIResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	// Check HTTP Response
+	if resp.StatusCode != http.StatusOK {
+		return NewsAPIResponse{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return NewsAPIResponse{}, err
+	}
+
+	var apiResp NewsAPIResponse
+	if err := json.Unmarshal(body, &apiResp); err != nil {
+		return NewsAPIResponse{}, err
+	}
+
+	return apiResp, nil
+}
 
 // type Content struct {
 // 	ID          uint       `json:"ID"`
@@ -29,22 +71,6 @@ package utils
 // 	Source      string     `json:"Source"`
 // 	Keywords    []string   `json:"Keywords"`
 // 	Category    string     `json:"Category"`
-// }
-
-// // Struct to parse response from NewsAPI
-// type NewsAPIResponse struct {
-// 	Articles []struct {
-// 		Source struct {
-// 			Id   string `json:"id"`
-// 			Name string `json:"name"`
-// 		} `json:"source"`
-// 		Title       string `json:"title"`
-// 		Description string `json:"description"`
-// 		Url         string `json:"url"`
-// 		UrlToImage  string `json:"urlToImage"`
-// 		PublishedAt string `json:"publishedAt"`
-// 		Content     string `json:"content"`
-// 	} `json:"articles"`
 // }
 
 // const KafkaTopicNewsInput = "news-input"
@@ -137,7 +163,7 @@ package utils
 
 // 	// Run the task once immediately and then schedule it to run periodically
 // 	fetchAndLogNews(db, NewsAPIKey)
-	
+
 // 	for range ticker.C {
 // 			fetchAndLogNews(db, NewsAPIKey)
 // 	}
