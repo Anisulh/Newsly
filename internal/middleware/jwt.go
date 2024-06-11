@@ -1,14 +1,12 @@
 package middleware
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // JWTProtected creates a middleware to protect routes with JWT validation.
-func JWTProtected(secret string) fiber.Handler {
+func (m *Middleware) JWTProtected() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Retrieve the JWT token from the cookie
 		tokenString := c.Cookies("token")
@@ -17,25 +15,21 @@ func JWTProtected(secret string) fiber.Handler {
 		if tokenString == "" {
 			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized",
+				"error":   "Unauthorized",
 				"message": "No token provided",
 			})
 		}
 
 		// Parse the token
 		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-			// Ensure the token's algorithm matches the expected HMAC algorithm
-			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-			}
-			return []byte(secret), nil
+			println(m.JWTSecret)
+			return []byte(m.JWTSecret), nil
 		})
-
 		// Check if the token is valid
 		if err != nil {
 			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized",
+				"error":   "Unauthorized",
 				"message": "Invalid token",
 				"details": err.Error(),
 			})
@@ -46,15 +40,19 @@ func JWTProtected(secret string) fiber.Handler {
 			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: Invalid token")
 		}
+		println(token.Claims)
 
 		// Extracting User ID from Token Claims
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			userID, ok := claims["user_id"].(string) // Ensure type assertion is safe
+
+			userIDFloat, ok := claims["sub"].(float64) // Ensure type assertion is safe
 			if !ok {
 				c.Set("HX-Redirect", "/")
 				return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: User ID invalid")
 			}
-			c.Locals("userID", userID) // Setting the user ID in Fiber's context
+
+			userID := uint(userIDFloat) // Convert float64 to uint
+			c.Locals("account", userID) // Setting the user ID in Fiber's context
 		} else {
 			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: Invalid token")
