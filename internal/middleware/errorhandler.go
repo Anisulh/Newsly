@@ -5,7 +5,7 @@ import (
     "log"
 )
 
-func ErrorHandler(ctx *fiber.Ctx, err error) error {
+func (m *Middleware) ErrorHandler(ctx *fiber.Ctx, err error) error {
     // Log the error
     log.Printf("Error: %v", err)
 
