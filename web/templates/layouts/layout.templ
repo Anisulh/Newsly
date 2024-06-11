@@ -1,33 +1,66 @@
 package layouts
 
 import (
-    "Newsly/web/templates/partials"
+	"Newsly/web/templates/partials"
 	"Newsly/internal/utils"
 )
 
-
-
 templ Layout(data utils.BaseData) {
-    <!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <title>Newsly</title>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <script
-                src="static/script/htmx.min.js"
-            ></script>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <script src="static/script/main.js"></script>
-        </head>
-        <body>
-            @partials.Navigation(data)
-            { children... }
-        </body>
-    </html>
-  }
-
-
-
-
-  
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<title>Newsly</title>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<script src="static/script/htmx.min.js"></script>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script> 
+          tailwind.config = {
+      content: ["./**/*.html", "./**/*.templ", "./**/*.go"],
+      theme: {
+        extend: {
+          colors: {
+            rosewater: "#f5e0dc",
+            flamingo: "#f2cdcd",
+            cp_pink: "#f5c2e7",
+            mauve: "#cba6f7",
+            cp_red: "#f38ba8",
+            maroon: "#eba0ac",
+            peach: "#fab387",
+            yellow: "#f9e2af",
+            green: "#a6e3a1",
+            teal: "#94e2d5",
+            sky: "#89dceb",
+            sapphire: "#74c7ec",
+            cp_blue: "#89b4fa",
+            lavender: "#b4befe",
+            text: "#cdd6f4",
+            subtext1: "#bac2de",
+            subtext0: "#a6adc8",
+            overlay2: "#9399b2",
+            overlay1: "#7f849c",
+            overlay0: "#6c7086",
+            surface2: "#585b70",
+            surface1: "#45475a",
+            surface0: "#313244",
+            cp_base: "#1e1e2e",
+            mantle: "#181825",
+            crust: "#11111b",
+          },
+        },
+      },
+      plugins: [],
+    }
+</script>
+			<script src="static/script/main.js"></script>
+		</head>
+		<body class="relative bg-cp_base text-text">
+			@partials.Navigation(data)
+			// @partials.Notification(data)
+			<div class="max-w-7xl mx-auto">
+				{ children... }
+			</div>
+			@partials.Footer()
+		</body>
+	</html>
+}
