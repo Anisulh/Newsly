@@ -20,7 +20,6 @@ func main() {
 
 	// Database connection
 	database := db.MustLoadDatabase(config.DBConnectionString)
-
 	// Start the scheduled fetching
 	// go utils.StartScheduledFetching(database, config.NewsAPIKey)
 	// go utils.StoreNews(database)
@@ -47,3 +46,4 @@ func handleGracefulShutdown(app *fiber.App) {
 	}
 	log.Println("Server stopped")
 }
+
