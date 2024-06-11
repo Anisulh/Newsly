@@ -1,0 +1,24 @@
+package partials
+
+import "Newsly/internal/utils"
+
+templ Notification(data utils.BaseData) {
+	if data.Message != "" {
+		<div class={ "border p-4 rounded absolute top-4 right-4 max-w-sm " + notificationStyle(data.MessageType) }>
+			<p>{ data.Message }</p>
+		</div>
+	}
+}
+
+func notificationStyle(messageType string) string {
+	switch messageType {
+	case "success":
+		return "bg-green-100 border-green-400 text-green-700"
+	case "error":
+		return "bg-red-100 border-red-400 text-red-700"
+	case "info":
+		return "bg-blue-100 border-blue-400 text-blue-700"
+	default:
+		return "bg-gray-100 border-gray-400 text-gray-700"
+	}
+}
