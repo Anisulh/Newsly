@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"time"
-
 	"Newsly/internal/models"
 	"Newsly/internal/utils"
+	"Newsly/web/templates/partials"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
@@ -13,21 +13,26 @@ import (
 func (h *Handler) UserRegistration(c *fiber.Ctx) error {
 	userInfo := &models.User{}
 	if err := c.BodyParser(userInfo); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user information"})
+		c.Status(fiber.StatusBadRequest)
+		return Render(c, partials.RegisterError("Invalid user information"))
 	}
 
 	// Check if the user already exists
 	var count int64
 	h.DB.Model(&models.User{}).Where("email = ?", userInfo.Email).Count(&count)
+
 	if count > 0 {
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "User already exists"})
+		c.Status(fiber.StatusConflict)
+		return Render(c, partials.RegisterError("Invalid user information"))
 	}
 	res := h.DB.Create(&userInfo)
 	if res.Error != nil {
+		c.Set("HX-Redirect", "/internal-server-error")
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 	}
 	token, err := utils.GenerateJWT(userInfo.ID, h.JWTSecret)
 	if err != nil {
+		c.Set("HX-Redirect", "/internal-server-error")
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 	}
 	cookie := fiber.Cookie{
@@ -38,37 +43,42 @@ func (h *Handler) UserRegistration(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&cookie)
-	c.Set("HX-Redirect", "/feed")
+	c.Set("HX-Redirect", "/auth/feed")
 
 	// Sending back a success message
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"success": "User registered successfully"})
+}
 
+type UserLoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (h *Handler) UserLogin(c *fiber.Ctx) error {
 	// Structure to hold login credentials
-	loginInfo := struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}{}
+	loginInfo := UserLoginRequest{}
 	if err := c.BodyParser(&loginInfo); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid login information"})
+		c.Status(fiber.StatusUnauthorized)
+		return Render(c, partials.LoginError())
 	}
 
 	// Find user by email
 	var user models.User
 	if err := h.DB.Where("email = ?", loginInfo.Email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Incorrect email or password"})
+		c.Status(fiber.StatusUnauthorized)
+		return Render(c, partials.LoginError())
 	}
 
 	// Check password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginInfo.Password)); err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Incorrect email or password"})
+		c.Status(fiber.StatusUnauthorized)
+		return Render(c, partials.LoginError())
 	}
 
 	// Generate JWT token
 	token, err := utils.GenerateJWT(user.ID, h.JWTSecret)
 	if err != nil {
+		c.Set("HX-Redirect", "/internal-server-error")
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 	}
 
@@ -78,12 +88,20 @@ func (h *Handler) UserLogin(c *fiber.Ctx) error {
 		Value:    token,
 		HTTPOnly: true,
 		Expires:  time.Now().Add(72 * time.Hour),
+		Secure:   h.Environment == "production",
+		SameSite: "Strict",
 	}
 
 	c.Cookie(&cookie)
 
-	c.Set("HX-Redirect", "/feed")
+	c.Set("HX-Redirect", "/auth/feed")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": "User logged in successfully"})
+}
+
+func (h *Handler) UserLogout(c *fiber.Ctx) error {
+	c.ClearCookie("token")
+	c.Set("HX-Redirect", "/")
+	return c.SendStatus(fiber.StatusOK)
 }
 
 // Secured Routes
@@ -95,6 +113,8 @@ func (h *Handler) GetUserProfile(c *fiber.Ctx) error {
 	if err := h.DB.First(&user, userID).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
 	}
+
+	c.Status(fiber.StatusOK)
 
 	return c.JSON(user)
 }
@@ -126,7 +146,7 @@ func (h *Handler) GetUserPreferences(c *fiber.Ctx) error {
 }
 
 func (h *Handler) UpdateUserPreferences(c *fiber.Ctx) error {
-	//userID := c.Locals("userID").(string)
+	// userID := c.Locals("userID").(string)
 
 	var newPreferences []models.Preference
 	if err := c.BodyParser(&newPreferences); err != nil {
