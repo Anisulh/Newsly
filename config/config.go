@@ -11,6 +11,7 @@ import (
 // Config stores all configuration values required by the application.
 type Config struct {
 	Port               string
+	Environment        string
 	ClientAddress      string
 	DBConnectionString string
 	JWTSecret          string
@@ -27,6 +28,9 @@ func loadEnv() (*Config, error) {
 	var err error
 
 	if config.Port, err = getEnv("PORT"); err != nil {
+		return nil, err
+	}
+	if config.Environment, err = getEnv("ENVIRONMENT"); err != nil {
 		return nil, err
 	}
 	if config.ClientAddress, err = getEnv("CLIENT_ADDRESS"); err != nil {
