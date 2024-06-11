@@ -2,53 +2,38 @@ package partials
 
 import "Newsly/internal/utils"
 
-
-
-templ Navigation(data utils.BaseData){
-    <nav class="bg-gray-800">
-        <div class="mx-auto px-8">
-            <div class="relative flex h-16 items-center justify-between">
-                <div class="flex flex-1 items-stretch justify-start space-x-4">
-                   
-                    if data.IsAuth {
-                        <a
-                            href="/feed" 
-                            
-                            class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                            >
-                            Your Feed
-                        </a>
-                    } else {
-                       <a
-                          href="/" 
-                          
-                          class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                          aria-current="page"
-                          >
-                          Home
-                        </a>
-                    }
-                </div>
-                <div class="inset-y-0 right-0 items-center pr-2 flex space-x-4">
-                    if data.IsAuth {
-                        <button
-                            class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                            hx-post="/logout">
-                            Logout
-                        </button>
-                    } else {
-                        <a
-                            href="/login" 
-                            
-                            class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                            aria-current="page"
-                            >
-                            Login
-                        </a>
-                    }
-                </div>
-            </div>
-        </div>
-    </nav>
-  }
-  
+templ Navigation(data utils.BaseData) {
+	<nav class="bg-mantle">
+		<div class="mx-auto px-8">
+			<div class="relative flex h-16 items-center justify-between">
+				<div class="flex flex-1 items-stretch justify-start space-x-4">
+					<a
+						href="/"
+						class="rounded-md px-3 py-2 font-bold text-xl"
+						aria-current="page"
+					>
+						Newsly
+					</a>
+				</div>
+				<div class="inset-y-0 right-0 items-center pr-2 flex space-x-4">
+					if data.IsAuth {
+						<button
+							class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
+							hx-post="/api/user/logout"
+						>
+							Logout
+						</button>
+					} else {
+						<a
+							href="/login"
+							class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
+							aria-current="page"
+						>
+							Login
+						</a>
+					}
+				</div>
+			</div>
+		</div>
+	</nav>
+}
