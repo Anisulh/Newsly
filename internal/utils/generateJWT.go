@@ -4,27 +4,26 @@ import (
 	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func GenerateJWT(id uint, secret string) (string, error) {
 	jwtSecret := []byte(secret)
-if len(jwtSecret) == 0 {
-	return "", errors.New("JWT secret is not set")
-}
-// Create token
-token := jwt.New(jwt.SigningMethodHS256)
+	if len(jwtSecret) == 0 {
+		return "", errors.New("JWT secret is not set")
+	}
+	// Create a new JWT token with claims
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": id,                               // Subject (user identifier)
+		"iss": "Newsly",                         // Issuer
+		"aud": "user",                           // Audience (user role)
+		"exp": time.Now().Add(time.Hour).Unix(), // Expiration time
+		"iat": time.Now().Unix(),                // Issued at
+	})
 
-// Set claims
-claims := token.Claims.(jwt.MapClaims)
-claims["user_id"] = id
-claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-
-// Generate encoded token and send it as response.
-t, err := token.SignedString(jwtSecret)
-if err != nil {
-	return "", err
-}
-
-return t, nil
+	tokenString, err := claims.SignedString(jwtSecret)
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
