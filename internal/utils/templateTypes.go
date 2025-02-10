@@ -9,7 +9,21 @@ type BaseData struct {
 	Account     *models.User
 	Message     string
 	MessageType string
-	Articles    []Article
+}
+
+type Category struct {
+	Title       string
+	Description string
+}
+
+type InterestTopicsData struct {
+	BaseData
+	Categories map[string]Category
+}
+
+type FeedData struct {
+	BaseData
+	Papers []ArxivEntry
 }
 
 type Notification struct {
