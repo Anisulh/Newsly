@@ -161,19 +161,3 @@ func (h *Handler) GetFeedPage(c *fiber.Ctx) error {
 	}
 	return Render(c, pages.FeedPage(extendedData))
 }
-
-func (h *Handler) GetSpecificNewsPage(c *fiber.Ctx) error {
-	account, ok := c.Locals("Account").(*models.User)
-	if !ok {
-		// Handle the case where the type assertion fails
-		return c.Status(fiber.StatusInternalServerError).SendString("Account information is not available")
-	}
-	extendedData := utils.FeedData{
-		BaseData: utils.BaseData{
-			IsAuth:  true,
-			Account: account,
-		},
-		// Articles: articles,
-	}
-	return Render(c, pages.FeedPage(extendedData))
-}
