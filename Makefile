@@ -2,7 +2,7 @@ APP_NAME=go-webapp
 
 .PHONY: install-deps
 install-deps:
-	npm install
+	cd ./web && npm install
 
 .PHONY: tailwind-watch
 tailwind-watch:
