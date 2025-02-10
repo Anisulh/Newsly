@@ -7,13 +7,13 @@ import (
 
 type User struct {
 	gorm.Model
-	Username    string
-	Email       string `gorm:"unique"`
-	Password    string
-	Preferences []Preference `gorm:"foreignKey:UserID"`
-	Bookmarks   []Content    `gorm:"many2many:user_bookmarks;"`
-	Likes       []Content    `gorm:"many2many:user_likes;"`
-	Dislikes    []Content    `gorm:"many2many:user_dislikes;"`
+	Email             string     `gorm:"uniqueIndex;not null"` // User email
+	Username          string     `gorm:"uniqueIndex;not null"` // Unique username
+	Password          string     `gorm:"not null"`
+	CategoryInterests []Category `gorm:"many2many:user_categories;"`
+	Likes             []Like
+	Comments          []Comment
+	SavedPapers       []SavedPaper
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
