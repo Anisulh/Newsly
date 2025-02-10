@@ -23,6 +23,7 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 		ErrorHandler: middleware.ErrorHandler,
 	})
 
+	// Serve static files
 	app.Static("/static", "./web/static")
 
 	// Middlewares
@@ -41,17 +42,16 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	pageRouter.Get("/", handler.GetHomePage)
 	pageRouter.Get("/login", handler.GetLoginPage)
 	pageRouter.Get("/register", handler.GetRegisterPage)
-	// pageRouter.Get("/news/:id", handler.GetNewsDetailPage)
-	// pageRouter.Get("/profile", handler.GetProfilePage)
-	// pageRouter.Get("/preferences", handler.GetPreferencesPage)
+	
 
 	// Private Page Routes
 	privatePageRouter := app.Group("/auth", middleware.JWTProtected())
+	privatePageRouter.Get("/interest-topics", handler.GetInterestsPage)
 	privatePageRouter.Get("/feed", handler.GetFeedPage)
 
 	// API Routes
 	// User Auth
-	userPublicRouter := app.Group("/api/user")
+	userPublicRouter := app.Group("/api/v1/user")
 	userPublicRouter.Post("/register", handler.UserRegistration)
 	userPublicRouter.Post("/login", handler.UserLogin)
 	userPublicRouter.Post("/logout", handler.UserLogout)
@@ -62,19 +62,9 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	// contentPublicRouter.Get("/categories", handler.GetContentCategories)
 
 	// Secured Routes
-	app.Use("/api/secure", middleware.JWTProtected())
 	// User Profile
-	userPrivateRouter := app.Group("/api/secure/user")
-	userPrivateRouter.Get("/profile", handler.GetUserProfile)
-	userPrivateRouter.Put("/profile", handler.UpdateUserProfile)
-	userPrivateRouter.Get("/preferences", handler.GetUserPreferences)
-	userPrivateRouter.Put("/preferences", handler.UpdateUserPreferences)
-
-	// Content Interaction
-	// contentPrivateRouter := app.Group("/api/content", middleware.JWTProtected)
-	// contentPrivateRouter.Post("/:contentId/like", handlers.LikeContent)
-	// contentPrivateRouter.Post("/:contentId/dislike", handlers.DislikeContent)
-	// contentPrivateRouter.Post("/:contentId/bookmark", handlers.BookmarkContent)
+	userPrivateRouter := app.Group("/api/v1/secure/user", middleware.JWTProtected())
+	userPrivateRouter.Post("/interest-topics", handler.SaveUserInterests)
 
 	return app, nil
 }
