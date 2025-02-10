@@ -1,0 +1,33 @@
+package partials
+
+templ Carousel() {
+  <div class="carousel-container">
+        <!-- Feature Cards -->
+        <div class="carousel-track">
+            <div class="carousel-card card-focused" id="card-0">
+                <h4 class="text-xl font-semibold text-indigo-600">Personalized News Feed</h4>
+                <p class="mt-2 text-gray-600">Get news articles tailored to your interests and reading habits.</p>
+            </div>
+            <div class="carousel-card card-right" id="card-1">
+                <h4 class="text-xl font-semibold text-indigo-600">Real-time Updates</h4>
+                <p class="mt-2 text-gray-600">Stay informed with the latest news as it happens.</p>
+            </div>
+            <div class="carousel-card card-left" id="card-2">
+                <h4 class="text-xl font-semibold text-indigo-600">Save for Later</h4>
+                <p class="mt-2 text-gray-600">Bookmark articles to read at your convenience.</p>
+            </div>
+            <div class="carousel-card card-left" id="card-3">
+                <h4 class="text-xl font-semibold text-indigo-600">Share with Friends</h4>
+                <p class="mt-2 text-gray-600">Easily share interesting articles with your friends.</p>
+            </div>
+            <div class="carousel-card card-left" id="card-4">
+                <h4 class="text-xl font-semibold text-indigo-600">Customizable Categories</h4>
+                <p class="mt-2 text-gray-600">Follow specific categories that interest you the most.</p>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <button class="carousel-btn left-btn" onclick="prevSlide()">&#9665;</button>
+        <button class="carousel-btn right-btn" onclick="nextSlide()">&#9655;</button>
+    </div>
+}

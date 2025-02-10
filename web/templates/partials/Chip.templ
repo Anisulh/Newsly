@@ -1,0 +1,14 @@
+package partials
+
+import (
+  "strings"
+)
+
+templ Chip(name string, color string) {
+	<a
+		href={ templ.URL("/auth/" + strings.ReplaceAll(name, " ", "-")) }
+		class={ "flex items-center justify-center w-20 h-8 rounded-full text-cp_base font-medium", color }
+	>
+		{ name }
+	</a>
+}

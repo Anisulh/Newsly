@@ -1,13 +1,13 @@
 package partials
 
 templ LoginError() {
-	<div class="alert alert-danger" role="alert">
+	<p class="alert alert-danger text-center text-cp_red" role="alert">
 		<strong>Error:</strong> Invalid username or password.
-	</div>
+	</p>
 }
 
 templ RegisterError(message string) {
-	<div class="alert alert-danger" role="alert">
+	<p class="alert alert-danger text-center text-cp_red" role="alert">
 		<strong>Error:</strong> { message }
-	</div>
+	</p>
 }

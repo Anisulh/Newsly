@@ -12,7 +12,8 @@ templ Layout(data utils.BaseData) {
 			<title>Newsly</title>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<script src="static/script/htmx.min.js"></script>
+      <link rel="stylesheet" href="/static/css/index.css"/>
+			<script src="/static/script/htmx.min.js"></script>
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script> 
           tailwind.config = {
@@ -52,7 +53,7 @@ templ Layout(data utils.BaseData) {
       plugins: [],
     }
 </script>
-			<script src="static/script/main.js"></script>
+			<script src="/static/script/main.js"></script>
 		</head>
 		<body class="relative bg-cp_base text-text">
 			@partials.Navigation(data)

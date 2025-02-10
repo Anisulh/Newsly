@@ -4,7 +4,7 @@ import "Newsly/internal/utils"
 
 templ Navigation(data utils.BaseData) {
 	<nav class="bg-mantle">
-		<div class="mx-auto px-8">
+		<div class="mx-auto px-2 md:px-8">
 			<div class="relative flex h-16 items-center justify-between">
 				<div class="flex flex-1 items-stretch justify-start space-x-4">
 					<a
@@ -19,14 +19,14 @@ templ Navigation(data utils.BaseData) {
 					if data.IsAuth {
 						<button
 							class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-							hx-post="/api/user/logout"
+							hx-post="/api/v1/user/logout"
 						>
 							Logout
 						</button>
 					} else {
 						<a
 							href="/login"
-							class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
+							class="text-rosewater rounded-md px-3 py-2 text-sm font-bold"
 							aria-current="page"
 						>
 							Login

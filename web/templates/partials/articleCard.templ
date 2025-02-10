@@ -1,0 +1,22 @@
+package partials
+
+import (
+  "Newsly/internal/utils"
+)
+
+templ PaperCard(articles []utils.ArxivEntry) {
+  <ul class="bg-mantle rounded-xl p-4">
+  for _, article := range articles { 
+  <l1>
+     <h2 class="text-xl font-bold">{article.Title}</h2>
+    <p class="text-sm text-subtext1"> {article.Summary} </p>
+    for _,link := range article.Links {
+
+    <a href={templ.SafeURL(link.Href)} target="_blank" class="text-blue-500 hover:underline">
+      Read more
+    </a>}
+    </l1>
+    }
+
+  </ul>
+}

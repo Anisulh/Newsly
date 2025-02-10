@@ -1,0 +1,53 @@
+package pages
+
+import (
+	"Newsly/web/templates/layouts"
+	"Newsly/internal/utils"
+	"Newsly/web/templates/partials"
+)
+
+
+
+
+templ InterestTopics(data utils.InterestTopicsData) {
+	@layouts.Layout(data.BaseData) {
+		<div class="min-h-screen my-10 flex flex-col gap-4 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+			<h1 class="font-bold text-2xl">Topics:</h1>
+			<p>Choose the research topics you're interested in:</p>
+			<div id="topics-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      for key, item := range data.Categories {
+       @partials.InterestTopicCard(key, item.Title, item.Description)
+      }
+			</div>
+			<button id="next-button" hx-trigger="click" hx-post="/api/v1/secure/user/interest-topics" class="mt-8 px-4 py-2 bg-blue-500 text-white rounded-md">
+				Next
+			</button>
+		</div>
+
+		<script>
+			// Track selected topics in a Set.
+			const selectedTopics = new Set();
+
+			// Toggle the visual state and update the Set.
+			function toggleTopic(el) {
+				const topic = el.getAttribute('data-topic');
+				if (selectedTopics.has(topic)) {
+					selectedTopics.delete(topic);
+					el.classList.remove('selected');
+					el.querySelector('.checkmark').classList.add('hidden');
+				} else {
+					selectedTopics.add(topic);
+					el.classList.add('selected');
+					el.querySelector('.checkmark').classList.remove('hidden');
+				}
+			}
+
+			// Before sending the POST request, attach the selected topics as JSON data.
+			document.getElementById('next-button').addEventListener('click', function(e) {
+				console.log('Selected topics:', Array.from(selectedTopics));
+				this.setAttribute('hx-vals', JSON.stringify({ categories: Array.from(selectedTopics) }));
+			});
+		</script>
+	  }
+  }

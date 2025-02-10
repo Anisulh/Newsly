@@ -1,0 +1,19 @@
+package partials
+
+import "Newsly/web/templates/partials/icons"
+
+
+templ InterestTopicCard(key string, title string, description string) {
+    <div class="topic-card relative border p-4 rounded-xl cursor-pointer" onclick="toggleTopic(this)" data-topic={key}>
+					<h2 class="font-semibold md:text-lg">
+            {title}
+          </h2>
+					<p class="text-sm md:text-base">
+            {description}
+          
+          </p>
+					<div class="size-6 checkmark hidden flex items-center justify-center text-cp_red bg-rosewater rounded-md absolute top-2 right-2">
+          @icons.CheckMark()
+          </div>
+				</div>
+}
