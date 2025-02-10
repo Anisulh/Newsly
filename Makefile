@@ -1,6 +1,8 @@
+APP_NAME=go-webapp
+
 .PHONY: tailwind-watch
 tailwind-watch:
-	~/tailwindcss -i ./web/static/css/index.css -o ./web/static/css/style.css --watch
+	npx @tailwindcss/cli -i ./web/static/css/index.css -o ./web/static/css/output.css --watch
 
 .PHONY: tailwind-build
 tailwind-build:
@@ -16,13 +18,28 @@ templ-watch:
 	
 .PHONY: dev
 dev:
-	go build -o ./tmp/$(APP_NAME) ./cmd/$(APP_NAME)/main.go && air
+	@echo "Building application..."
+	go build -o ./tmp/$(APP_NAME) ./cmd/$(APP_NAME)/main.go
+	@echo "Starting development watchers..."
+	# Run air in the background
+	air & \
+	# Run templ watcher in the background
+	templ generate --watch & \
+	# Run tailwind watcher in the background
+	npx @tailwindcss/cli -i ./web/static/css/index.css -o ./web/static/css/output.css --watch & \
+	# Wait for all background processes to exit
+	wait
 
 .PHONY: build
 build:
 	make tailwind-build
 	make templ-generate
 	go build -ldflags "-X main.Environment=production" -o ./bin/$(APP_NAME) ./cmd/$(APP_NAME)/main.go
+
+.PHONY: prod
+prod: build
+	@echo "Starting production application..."
+	./bin/$(APP_NAME)
 
 .PHONY: vet
 vet:
