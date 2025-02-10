@@ -40,7 +40,6 @@ func (m *Middleware) JWTProtected() fiber.Handler {
 			c.Set("HX-Redirect", "/")
 			return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized: Invalid token")
 		}
-		println(token.Claims)
 
 		// Extracting User ID from Token Claims
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
