@@ -6,7 +6,7 @@ tailwind-watch:
 
 .PHONY: tailwind-build
 tailwind-build:
-	~/tailwindcss -i ./web/static/css/index.css -o ./web/static/css/style.min.css --minify
+	npx @tailwindcss/cli -i ./web/static/css/index.css -o ./web/static/css/style.min.css --minify
 
 .PHONY: templ-generate
 templ-generate:
