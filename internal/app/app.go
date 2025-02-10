@@ -56,11 +56,6 @@ func newApp(db *gorm.DB, config *config.Config) (*fiber.App, error) {
 	userPublicRouter.Post("/login", handler.UserLogin)
 	userPublicRouter.Post("/logout", handler.UserLogout)
 
-	// Content Discover
-	// contentPublicRouter := app.Group("/api/content")
-	// contentPublicRouter.Get("/", handler.GetContent)
-	// contentPublicRouter.Get("/categories", handler.GetContentCategories)
-
 	// Secured Routes
 	// User Profile
 	userPrivateRouter := app.Group("/api/v1/secure/user", middleware.JWTProtected())
