@@ -22,7 +22,6 @@ func (m *Middleware) JWTProtected() fiber.Handler {
 
 		// Parse the token
 		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-			println(m.JWTSecret)
 			return []byte(m.JWTSecret), nil
 		})
 		// Check if the token is valid
