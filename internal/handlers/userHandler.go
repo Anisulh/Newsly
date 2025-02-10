@@ -4,6 +4,7 @@ import (
 	"Newsly/internal/models"
 	"Newsly/internal/utils"
 	"Newsly/web/templates/partials"
+	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,14 +37,15 @@ func (h *Handler) UserRegistration(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 	}
 	cookie := fiber.Cookie{
-		Name:     "jwt",
+		Name:     "token",
 		Value:    token,
 		HTTPOnly: true,
 		Expires:  time.Now().Add(72 * time.Hour),
+		Secure:   h.Environment == "production",
 	}
 
 	c.Cookie(&cookie)
-	c.Set("HX-Redirect", "/auth/feed")
+	c.Set("HX-Redirect", "/auth/interest-topics")
 
 	// Sending back a success message
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"success": "User registered successfully"})
@@ -93,7 +95,11 @@ func (h *Handler) UserLogin(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&cookie)
-
+	// if user's category interests are not set, redirect to interests page
+	if len(user.CategoryInterests) == 0 {
+		c.Set("HX-Redirect", "/auth/interest-topics")
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": "User logged in successfully"})
+	}
 	c.Set("HX-Redirect", "/auth/feed")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": "User logged in successfully"})
 }
@@ -105,56 +111,60 @@ func (h *Handler) UserLogout(c *fiber.Ctx) error {
 }
 
 // Secured Routes
+// SaveUserInterestsRequest is the expected JSON payload.
+type SaveUserInterestsRequest struct {
+	Categories []string `json:"categories"`
+}
 
-func (h *Handler) GetUserProfile(c *fiber.Ctx) error {
-	userID := c.Locals("userID").(string)
+// SaveUserInterests updates the user's interests based on the selected category keys.
+func (h *Handler) SaveUserInterests(c *fiber.Ctx) error {
+	// Parse the incoming JSON payload.
+	var req SaveUserInterestsRequest
+	if err := c.BodyParser(&req); err != nil {
+		log.Printf("Error parsing request: %v", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request payload",
+		})
+	}
 
+	// Get the current user ID from the context.
+	userID, ok := c.Locals("account").(uint)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized or invalid user session",
+		})
+	}
+
+	// Fetch the user from the database.
 	var user models.User
 	if err := h.DB.First(&user, userID).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+		log.Printf("User not found: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "User not found",
+		})
 	}
 
-	c.Status(fiber.StatusOK)
-
-	return c.JSON(user)
-}
-
-func (h *Handler) UpdateUserProfile(c *fiber.Ctx) error {
-	userID := c.Locals("userID").(string)
-
-	var updateInfo models.User
-	if err := c.BodyParser(&updateInfo); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user information"})
+	// Fetch the categories from the database based on the provided keys.
+	var selectedCategories []models.Category
+	if err := h.DB.
+		Where("key IN ?", req.Categories).
+		Find(&selectedCategories).Error; err != nil {
+		log.Printf("Error fetching categories: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error fetching categories",
+		})
 	}
 
-	if err := h.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updateInfo).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not update user profile"})
+	// Replace the user's current category interests with the selected ones.
+	if err := h.DB.Model(&user).Association("CategoryInterests").Replace(selectedCategories); err != nil {
+		log.Printf("Error updating interests: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error updating user interests",
+		})
 	}
+	c.Set("HX-Redirect", "/auth/feed")
 
-	return c.SendStatus(fiber.StatusOK)
-}
-
-func (h *Handler) GetUserPreferences(c *fiber.Ctx) error {
-	userID := c.Locals("userID").(string)
-
-	var preferences []models.Preference
-	if err := h.DB.Where("user_id = ?", userID).Find(&preferences).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not fetch preferences"})
-	}
-
-	return c.JSON(preferences)
-}
-
-func (h *Handler) UpdateUserPreferences(c *fiber.Ctx) error {
-	// userID := c.Locals("userID").(string)
-
-	var newPreferences []models.Preference
-	if err := c.BodyParser(&newPreferences); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid preference format"})
-	}
-
-	// Update preferences logic
-	// ...
-
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "User interests updated successfully",
+	})
 }
