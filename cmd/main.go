@@ -20,9 +20,6 @@ func main() {
 
 	// Database connection
 	database := db.MustLoadDatabase(config.DBConnectionString)
-	// Start the scheduled fetching
-	// go utils.StartScheduledFetching(database, config.NewsAPIKey)
-	// go utils.StoreNews(database)
 
 	// Start the server
 	app := app.MustStart(database, config)
