@@ -9,8 +9,16 @@ import (
 )
 
 func migrate(db *gorm.DB) error {
-	// Migrate the schema
-	return db.AutoMigrate(&models.User{}, &models.Category{})
+	// Auto-migrate the schema to re-create the tables.
+	return db.AutoMigrate(
+		&models.User{},
+		&models.Category{},
+		&models.Like{},
+		&models.Comment{},
+		&models.ResearchPaper{},
+		&models.SavedPaper{},
+	)
+
 }
 
 func initializeCategories(db *gorm.DB) error {
@@ -47,16 +55,19 @@ func setupDatabase(connectionString string) (*gorm.DB, error) {
 	log.Print("Setting up database")
 	db, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
+		log.Printf("Error connecting to database: %v", err)
 		return nil, err
 	}
 
 	err = migrate(db)
 	if err != nil {
+		log.Printf("Error migrating database: %v", err)
 		return nil, err
 	}
 	log.Print("Database migration successful")
 	err = initializeCategories(db)
 	if err != nil {
+		log.Printf("Error initializing categories: %v", err)
 		return nil, err
 	}
 	log.Print("Database initialization successful")
