@@ -5,7 +5,7 @@ install-deps:
 	@echo "Installing dependencies..."
 	go mod tidy
 	cd ./web && npm install
-	go install github.com/a-h/templ@latest
+	go install github.com/a-h/templ/cmd/templ@latest
 
 .PHONY: tailwind-watch
 tailwind-watch:
