@@ -2,8 +2,10 @@ APP_NAME=go-webapp
 
 .PHONY: install-deps
 install-deps:
+	@echo "Installing dependencies..."
 	go mod tidy
 	cd ./web && npm install
+	go install github.com/a-h/templ@latest
 
 .PHONY: tailwind-watch
 tailwind-watch:
@@ -11,10 +13,12 @@ tailwind-watch:
 
 .PHONY: tailwind-build
 tailwind-build:
+	@echo "Building tailwindcss..."
 	npx @tailwindcss/cli -i ./web/static/css/index.css -o ./web/static/css/style.min.css --minify
 
 .PHONY: templ-generate
 templ-generate:
+	@echo "Generating templates..."
 	templ generate
 
 .PHONY: templ-watch
@@ -39,6 +43,7 @@ dev:
 build: install-deps
 	make tailwind-build
 	make templ-generate
+	@echo "Building application..."
 	go build -ldflags "-X main.Environment=production" -o ./bin/$(APP_NAME) ./cmd/$(APP_NAME)/main.go
 
 
