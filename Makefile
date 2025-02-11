@@ -48,7 +48,7 @@ build: install-deps
 
 
 .PHONY: prod
-prod: build
+prod:
 	@echo "Starting production application..."
 	./bin/$(APP_NAME)
 
