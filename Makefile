@@ -1,5 +1,3 @@
-APP_NAME=go-webapp
-
 .PHONY: install-deps
 install-deps:
 	@echo "Installing dependencies..."
@@ -28,7 +26,7 @@ templ-watch:
 .PHONY: dev
 dev:
 	@echo "Building application..."
-	go build -o ./tmp/$(APP_NAME) ./cmd/$(APP_NAME)/main.go
+	go build -o ./tmp/$(APP_NAME) ./cmd/main.go
 	@echo "Starting development watchers..."
 	# Run air in the background
 	air & \
@@ -44,7 +42,7 @@ build: install-deps
 	make tailwind-build
 	make templ-generate
 	@echo "Building application..."
-	go build -ldflags "-X main.Environment=production" -o ./bin/$(APP_NAME) ./cmd/$(APP_NAME)/main.go
+	go build -ldflags "-X main.Environment=production" -o ./bin ./cmd/main.go
 
 
 .PHONY: prod
