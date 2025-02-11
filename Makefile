@@ -2,6 +2,7 @@ APP_NAME=go-webapp
 
 .PHONY: install-deps
 install-deps:
+	go mod tidy
 	cd ./web && npm install
 
 .PHONY: tailwind-watch
