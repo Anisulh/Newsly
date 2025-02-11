@@ -9,15 +9,17 @@ import (
 )
 
 func migrate(db *gorm.DB) error {
-	// Auto-migrate the schema to re-create the tables.
-	return db.AutoMigrate(
-		&models.User{},
-		&models.Category{},
-		&models.Like{},
-		&models.Comment{},
-		&models.ResearchPaper{},
-		&models.SavedPaper{},
-	)
+	// First, migrate tables that are independent or referenced by others.
+	if err := db.AutoMigrate(&models.User{}, &models.ResearchPaper{}, &models.Category{}); err != nil {
+		return err
+	}
+
+	// Next, migrate the dependent tables.
+	if err := db.AutoMigrate(&models.Like{}, &models.Comment{}, &models.SavedPaper{}); err != nil {
+		return err
+	}
+
+	return nil
 
 }
 
